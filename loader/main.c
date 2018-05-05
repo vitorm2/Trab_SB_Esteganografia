@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>		// Para usar strings
+#include <math.h>
 
 // SOIL é a biblioteca para leitura das imagens
 #include "SOIL.h"
@@ -20,7 +21,7 @@ typedef struct {
 
 void funcao(char vetor[], int tamanho);
 
-void separaNumero(char vetor, unsigned char* bit8_7, unsigned char* bit6_5, unsigned char* bit4_3, unsigned char* bit2_1);
+void separaNumero(char letra ,unsigned char* bit8_7, unsigned char* bit6_5, unsigned char* bit4_3, unsigned char* bit2_1);
 
 void funcaoPrincipal(char vetor[], int num_pixels, Img pic);
 
@@ -42,10 +43,10 @@ void load(char* name, Img* pic)
 
 int main(int argc, char** argv)
 {
-    char vetor[] = "Vamos fazer uma casa em cima da casa da sua mae";
+    char vetor[] = "casa";
     int tamanho = strlen(vetor);
 
-    int num_pixels = (tamanho + 0) * 4;
+    int num_pixels = (tamanho * 4) / 3;
 
     Img pic;
     if(argc < 1) {
@@ -55,10 +56,10 @@ int main(int argc, char** argv)
     load(argv[1], &pic);
 
 
-    funcao(vetor, tamanho);
+    //funcao(vetor, tamanho);
 
     printf("Primeiros 10 pixels da imagem:\n");
-    for(int i=0; i<10; i++) {
+    for(int i=0; i<6; i++) {
         printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
     }
     printf("\n");
@@ -66,7 +67,7 @@ int main(int argc, char** argv)
     funcaoPrincipal(vetor, num_pixels, pic);
 
     printf("Primeiros 10 pixels da imagem:\n");
-    for(int i=0; i<10; i++) {
+    for(int i=0; i<6; i++) {
         printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
     }
     printf("\n");
@@ -84,11 +85,13 @@ int main(int argc, char** argv)
 
     //for(int i=0; i<tamanho;i++){
 
-void separaNumero(char vetor, unsigned char* bit8_7, unsigned char* bit6_5, unsigned char* bit4_3, unsigned char* bit2_1){
+void separaNumero(char letra, unsigned char* bit8_7, unsigned char* bit6_5, unsigned char* bit4_3, unsigned char* bit2_1){
 
     unsigned int mask2 = 0b00000011;
     int aux;
-    aux = vetor;
+    aux = letra;
+
+    printf("aux = %d\n", aux);
 
     unsigned char palavra = aux;
     *bit8_7 = palavra>>6;
@@ -115,7 +118,7 @@ void funcaoPrincipal(char vetor[], int num_pixels, Img pic){
 
     unsigned int mask = 0b11111100;
 
-    for(int i=1; i<num_pixels; i= i+4){
+    for(int i=0; i<num_pixels; i= i+4){
 
         unsigned char bit8_7;
         unsigned char bit6_5;
@@ -133,6 +136,8 @@ void funcaoPrincipal(char vetor[], int num_pixels, Img pic){
 
         separaNumero(vetor[j], &bit8_7, &bit6_5, &bit4_3, &bit2_1);
 
+       //  printf("bit 8 e 7: %d      bit 6 e 5: %d\nbit 4 e 3: %d      bit 2 e 1: %d\n\n\n", bit8_7,bit6_5,bit4_3,bit2_1);
+
         pic.img[i].r = pic.img[i].r | bit8_7;
         pic.img[i].g = pic.img[i].g | bit6_5;
         pic.img[i].b = pic.img[i].b | bit4_3;
@@ -140,38 +145,50 @@ void funcaoPrincipal(char vetor[], int num_pixels, Img pic){
 
         //printf("[%d %d %d %d]\n", pic.img[i].r, pic.img[i].g, pic.img[i].b,  pic.img[i+1].r);
 
-        if((i+2) == num_pixels){
+        int num1 = i + 2;
+
+        printf("num1 = %d\n", num1);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if(num1 >= num_pixels){
+            printf("IF 1");
             break;
         }
 
-        pic.img[i+1].g = pic.img[i+1].r & mask;
-        pic.img[i+1].b = pic.img[i+1].r & mask;
+        pic.img[i+1].g = pic.img[i+1].g & mask;
+        pic.img[i+1].b = pic.img[i+1].b & mask;
         pic.img[i+2].r = pic.img[i+2].r & mask;
-        pic.img[i+2].g = pic.img[i+2].r & mask;
+        pic.img[i+2].g = pic.img[i+2].g & mask;
 
         separaNumero(vetor[j+1], &bit8_7, &bit6_5, &bit4_3, &bit2_1);
 
-        pic.img[i+1].r = pic.img[i+1].r | bit8_7;
-        pic.img[i+1].g = pic.img[i+1].g | bit6_5;
-        pic.img[i+2].b = pic.img[i+2].b | bit4_3;
-        pic.img[i+2].r = pic.img[i+2].r | bit2_1;
+       // printf("bit 8 e 7: %d      bit 6 e 5: %d\nbit 4 e 3: %d      bit 2 e 1: %d\n\n\n", bit8_7,bit6_5,bit4_3,bit2_1);
+
+        pic.img[i+1].g = pic.img[i+1].g | bit8_7;
+        pic.img[i+1].b = pic.img[i+1].b | bit6_5;
+        pic.img[i+2].r = pic.img[i+2].r | bit4_3;
+        pic.img[i+2].g = pic.img[i+2].g | bit2_1;
 
 
-        if((i+3) == num_pixels){
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        num1 = i + 3;
+        printf("num1 = %d\n", num1);
+        if(num1 >= num_pixels ){
+            printf("IF 2");
             break;
+
         }
 
-        pic.img[i+2].b = pic.img[i+2].r & mask;
+        pic.img[i+2].b = pic.img[i+2].b & mask;
         pic.img[i+3].r = pic.img[i+3].r & mask;
-        pic.img[i+3].g = pic.img[i+3].r & mask;
-        pic.img[i+3].b = pic.img[i+3].r & mask;
+        pic.img[i+3].g = pic.img[i+3].g & mask;
+        pic.img[i+3].b = pic.img[i+3].b & mask;
 
         separaNumero(vetor[j+2], &bit8_7, &bit6_5, &bit4_3, &bit2_1);
 
-        pic.img[i+2].r = pic.img[i+2].r | bit8_7;
-        pic.img[i+3].g = pic.img[i+3].g | bit6_5;
-        pic.img[i+3].b = pic.img[i+3].b | bit4_3;
-        pic.img[i+3].r = pic.img[i+3].r | bit2_1;
+        pic.img[i+2].b = pic.img[i+2].b | bit8_7;
+        pic.img[i+3].r = pic.img[i+3].r | bit6_5;
+        pic.img[i+3].g = pic.img[i+3].g | bit4_3;
+        pic.img[i+3].b = pic.img[i+3].b | bit2_1;
 
         j = j + 3;
 }
@@ -187,7 +204,7 @@ void funcaoPrincipal(char vetor[], int num_pixels, Img pic){
     free(pic.img);
 */
 }
-
+/*
 void funcao(char vetor[], int tamanho) {
     int i;
 
@@ -201,4 +218,4 @@ void funcao(char vetor[], int tamanho) {
         }
     }
     //printf("%s", vetor);
-}
+}*/
