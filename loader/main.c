@@ -45,7 +45,8 @@ int main(int argc, char** argv)
 {
     char senha[] = "";
     printf("Digite a senha:");
-    scanf("%s", &senha);
+    scanf(" %[^\n]s", senha);
+    //scanf("%s", &senha);
 
     // pega o tamanho da senha e cria outro tamanho somando mais por causa do simbolo
     float tamanhoSenha = strlen(senha);
@@ -59,8 +60,8 @@ int main(int argc, char** argv)
 
     char mensagem[] = "";
     printf("Digite a mensagem:");
-    scanf("%s", &mensagem);
-
+    scanf(" %[^\n]s", mensagem); // Pega mesagem completa incluindo espaços
+    //scanf("%s", &mensagem);
     // pega o tamanho da mensagem cria outro tamanho somando mais por causa do simbolo
     float tamanhoMensagem = strlen(mensagem);
     int tamanhoMsgComSimb = tamanhoMensagem +1;
@@ -191,10 +192,10 @@ void funcaoPrincipal(char vetor[], int tipo, float num_bytes, Img pic){
 
        //  printf("bit 8 e 7: %d      bit 6 e 5: %d\nbit 4 e 3: %d      bit 2 e 1: %d\n\n\n", bit8_7,bit6_5,bit4_3,bit2_1);
 
-        pic.img[i].r = pic.img[i].r | bit8_7;
-        pic.img[i].g = pic.img[i].g | bit6_5;
-        pic.img[i].b = pic.img[i].b | bit4_3;
-        pic.img[i+1].r = pic.img[i+1].r | bit2_1;
+        pic.img[i].r = 255;//pic.img[i].r | bit8_7;
+        pic.img[i].g = 0;//pic.img[i].g | bit6_5;
+        pic.img[i].b = 0;//pic.img[i].b | bit4_3;
+        pic.img[i+1].r = 255;//pic.img[i+1].r | bit2_1;
 
         //printf("[%d %d %d %d]\n", pic.img[i].r, pic.img[i].g, pic.img[i].b,  pic.img[i+1].r);
 
@@ -216,10 +217,10 @@ void funcaoPrincipal(char vetor[], int tipo, float num_bytes, Img pic){
 
        // printf("bit 8 e 7: %d      bit 6 e 5: %d\nbit 4 e 3: %d      bit 2 e 1: %d\n\n\n", bit8_7,bit6_5,bit4_3,bit2_1);
 
-        pic.img[i+1].g = pic.img[i+1].g | bit8_7;
-        pic.img[i+1].b = pic.img[i+1].b | bit6_5;
-        pic.img[i+2].r = pic.img[i+2].r | bit4_3;
-        pic.img[i+2].g = pic.img[i+2].g | bit2_1;
+        pic.img[i+1].g = 0;//pic.img[i+1].g | bit8_7;
+        pic.img[i+1].b = 0;//pic.img[i+1].b | bit6_5;
+        pic.img[i+2].r = 255;//pic.img[i+2].r | bit4_3;
+        pic.img[i+2].g = 0;//pic.img[i+2].g | bit2_1;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -238,10 +239,10 @@ void funcaoPrincipal(char vetor[], int tipo, float num_bytes, Img pic){
 
         separaNumero(vetor[j+2], &bit8_7, &bit6_5, &bit4_3, &bit2_1);
 
-        pic.img[i+2].b = pic.img[i+2].b | bit8_7;
-        pic.img[i+3].r = pic.img[i+3].r | bit6_5;
-        pic.img[i+3].g = pic.img[i+3].g | bit4_3;
-        pic.img[i+3].b = pic.img[i+3].b | bit2_1;
+        pic.img[i+2].b = 0;//pic.img[i+2].b | bit8_7;
+        pic.img[i+3].r = 255;//pic.img[i+3].r | bit6_5;
+        pic.img[i+3].g = 0;//pic.img[i+3].g | bit4_3;
+        pic.img[i+3].b = 0;//pic.img[i+3].b | bit2_1;
 
         j = j + 3;
 }
