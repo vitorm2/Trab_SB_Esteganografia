@@ -23,7 +23,7 @@ void funcao(char vetor[], int tamanho);
 
 void separaNumero(char letra ,unsigned char* bit8_7, unsigned char* bit6_5, unsigned char* bit4_3, unsigned char* bit2_1);
 
-void funcaoPrincipal(char vetor[], float num_pixels, Img pic);
+void funcaoPrincipal(char vetor[], int tipo, float num_bytes, Img pic);
 
 void load(char* name, Img* pic);
 
@@ -43,12 +43,37 @@ void load(char* name, Img* pic)
 
 int main(int argc, char** argv)
 {
-    char vetor[] = "casa";
-    float tamanho = strlen(vetor);
+    char senha[] = "";
+    printf("Digite a senha:");
+    scanf("%s", &senha);
 
-    float num_pixels = ((tamanho+1) * 4) / 3;
+    // pega o tamanho da senha e cria outro tamanho somando mais por causa do simbolo
+    float tamanhoSenha = strlen(senha);
+    int tamanhoSenhaComSimb = tamanhoSenha +1;
 
-    //printf("TAMANHO = %f\n", ceil(num_pixels));
+    // cria o array com o tamanho com o simb ja incluido
+    char senhaComSimb[tamanhoSenhaComSimb];
+    strcpy(senhaComSimb, senha);
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+    char mensagem[] = "";
+    printf("Digite a mensagem:");
+    scanf("%s", &mensagem);
+
+    // pega o tamanho da mensagem cria outro tamanho somando mais por causa do simbolo
+    float tamanhoMensagem = strlen(mensagem);
+    int tamanhoMsgComSimb = tamanhoMensagem +1;
+
+
+    // Cria um novo vetor com o vetor antigo mais 1 espaço (estava bugando a imagem se tentava concatenar).
+    char msgComSimb[tamanhoMsgComSimb];
+    strcpy(msgComSimb, mensagem);
+
+
+    // Calcula o numero de bytes que o laço vai ter q percorrer
+    float num_bytesSenha = ((tamanhoSenha+1) * 4) / 3;
+    float num_bytes = ((tamanhoMensagem+1) * 4) / 3;
 
     Img pic;
     if(argc < 1) {
@@ -60,24 +85,31 @@ int main(int argc, char** argv)
 
     //funcao(vetor, tamanho);
 
-    printf("Primeiros 10 pixels da imagem:\n");
-    for(int i=0; i<8; i++) {
-        printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
-    }
-    printf("\n");
+    //printf("Primeiros 10 pixels da imagem:\n");
+    //for(int i=0; i<8; i++) {
+      //  printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
+    //}
+    //printf("\n");
 
 
-    char sinal[] = "#"; // ASCIII 35
-    strcat(vetor, sinal);
+    // Adiciona o simbolo de parada a senha e a mensagem
+    char sinal[] = "|"; // ASCIII 124 - simbolo de parada
+    strcat(senhaComSimb, sinal);
 
-    printf("%s\n", vetor);
-    funcaoPrincipal(vetor, ceil(num_pixels), pic); // Arredonda pra cima o tamanho
+    char sinal2[] = "|"; // ASCIII 124 - simbolo de parada
+    strcat(msgComSimb, sinal2);
 
-    printf("Primeiros 10 pixels da imagem:\n");
-    for(int i=0; i<8; i++) {
-        printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
-    }
-    printf("\n");
+    printf("%s\n", senhaComSimb);
+    printf("%s\n", msgComSimb);
+
+    funcaoPrincipal(senhaComSimb, 0, ceil(num_bytesSenha), pic); // Arredonda pra cima o tamanho, valor 0 significa que é uma senha
+    funcaoPrincipal(msgComSimb, 1, ceil(num_bytes), pic); // Arredonda pra cima o tamanho, valor 1 significa que é uma msg.
+
+    //printf("Primeiros 10 pixels da imagem:\n");
+    //for(int i=0; i<8; i++) {
+      //  printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
+    //}
+    //printf("\n");
 
     SOIL_save_image("saida.bmp", SOIL_SAVE_TYPE_BMP, pic.width, pic.height, 3, pic.img);
 
@@ -116,8 +148,11 @@ void separaNumero(char letra, unsigned char* bit8_7, unsigned char* bit6_5, unsi
 
 
     // Bota a letra no RGB
+    // O tipo pode ser 0 ou 1.
+    // se for 0 significa q o vetor que ele esta passado é uma senha entao ele vai botar a senha na primeira linha da imagem
+    // se for 1 significa q o vetor é uma mensagem entao ele vai botar a msg na segunda linhha da imagem.
 
-void funcaoPrincipal(char vetor[], float num_pixels, Img pic){
+void funcaoPrincipal(char vetor[], int tipo, float num_bytes, Img pic){
 
     //printf("num_pixels = %f\n", num_pixels);
 
@@ -125,7 +160,18 @@ void funcaoPrincipal(char vetor[], float num_pixels, Img pic){
 
     unsigned int mask = 0b11111100;
 
-    for(int i=0; i<num_pixels; i= i+4){
+    int num_bytes2;
+    int iniciaEm;
+
+    if(tipo >= 1){
+        num_bytes2 = num_bytes + pic.width; //SEGUNDA LINHA
+        iniciaEm = pic.width;
+    }else{
+        num_bytes2 = num_bytes;
+        iniciaEm = 0;
+    }
+
+    for(int i=iniciaEm; i<num_bytes2; i= i+4){
 
         unsigned char bit8_7;
         unsigned char bit6_5;
@@ -156,7 +202,7 @@ void funcaoPrincipal(char vetor[], float num_pixels, Img pic){
 
         printf("num1 = %d\n", num1);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(num1 >= num_pixels){
+        if(num1 >= num_bytes2){
             printf("IF 1");
             break;
         }
@@ -179,7 +225,7 @@ void funcaoPrincipal(char vetor[], float num_pixels, Img pic){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         num1 = i + 3;
         printf("num1 = %d\n", num1);
-        if(num1 >= num_pixels ){
+        if(num1 >= num_bytes2 ){
             printf("IF 2");
             break;
 
