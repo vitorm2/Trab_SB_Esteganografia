@@ -23,7 +23,7 @@ void funcao(char vetor[], int tamanho);
 
 void separaNumero(char letra ,unsigned char* bit8_7, unsigned char* bit6_5, unsigned char* bit4_3, unsigned char* bit2_1);
 
-void funcaoPrincipal(char vetor[], int num_pixels, Img pic);
+void funcaoPrincipal(char vetor[], float num_pixels, Img pic);
 
 void load(char* name, Img* pic);
 
@@ -44,9 +44,11 @@ void load(char* name, Img* pic)
 int main(int argc, char** argv)
 {
     char vetor[] = "casa";
-    int tamanho = strlen(vetor);
+    float tamanho = strlen(vetor);
 
-    int num_pixels = (tamanho * 4) / 3;
+    float num_pixels = ((tamanho+1) * 4) / 3;
+
+    //printf("TAMANHO = %f\n", ceil(num_pixels));
 
     Img pic;
     if(argc < 1) {
@@ -59,15 +61,20 @@ int main(int argc, char** argv)
     //funcao(vetor, tamanho);
 
     printf("Primeiros 10 pixels da imagem:\n");
-    for(int i=0; i<6; i++) {
+    for(int i=0; i<8; i++) {
         printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
     }
     printf("\n");
 
-    funcaoPrincipal(vetor, num_pixels, pic);
+
+    char sinal[] = "#"; // ASCIII 35
+    strcat(vetor, sinal);
+
+    printf("%s\n", vetor);
+    funcaoPrincipal(vetor, ceil(num_pixels), pic); // Arredonda pra cima o tamanho
 
     printf("Primeiros 10 pixels da imagem:\n");
-    for(int i=0; i<6; i++) {
+    for(int i=0; i<8; i++) {
         printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
     }
     printf("\n");
@@ -82,8 +89,6 @@ int main(int argc, char** argv)
 
 
     // Preapara a letra para passar pro RGB.
-
-    //for(int i=0; i<tamanho;i++){
 
 void separaNumero(char letra, unsigned char* bit8_7, unsigned char* bit6_5, unsigned char* bit4_3, unsigned char* bit2_1){
 
@@ -112,7 +117,9 @@ void separaNumero(char letra, unsigned char* bit8_7, unsigned char* bit6_5, unsi
 
     // Bota a letra no RGB
 
-void funcaoPrincipal(char vetor[], int num_pixels, Img pic){
+void funcaoPrincipal(char vetor[], float num_pixels, Img pic){
+
+    //printf("num_pixels = %f\n", num_pixels);
 
     int j = 0; //contador da palavra a cada laco 3 letras
 
@@ -204,7 +211,7 @@ void funcaoPrincipal(char vetor[], int num_pixels, Img pic){
     free(pic.img);
 */
 }
-/*
+
 void funcao(char vetor[], int tamanho) {
     int i;
 
@@ -216,6 +223,6 @@ void funcao(char vetor[], int tamanho) {
         }else if(vetor[i] != ' '){
             vetor[i] = vetor[i] + 1;
         }
+    printf("%s", vetor);
     }
-    //printf("%s", vetor);
-}*/
+}
