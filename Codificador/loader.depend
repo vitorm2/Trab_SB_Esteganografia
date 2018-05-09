@@ -287,3 +287,12 @@
 
 1504289654 c:\users\gerson\desktop\software basico\trab_softbase\codificador\lib\soil\stbi_dds_aug_c.h
 
+1525663645 source:c:\users\gerson\desktop\software basico\trab_softbase\codificador\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"SOIL.h"
+
+1504289654 c:\users\gerson\desktop\software basico\trab_softbase\codificador\soil.h
+

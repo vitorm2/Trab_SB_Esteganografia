@@ -25,6 +25,10 @@ char separaBitsPalavra(unsigned char* bit8_7, unsigned char* bit6_5, unsigned ch
 
 void decodificacaoEsteganografia(char vetor[], int tipo, Img pic);
 
+int contaTamanho(int tipo, Img pic);
+
+void juntaLetra(char letra, char vetor[], int tamanho);
+
 void load(char* name, Img* pic);
 
 
@@ -43,7 +47,6 @@ void load(char* name, Img* pic)
 
 int main(int argc, char** argv)
 {
-    //printf("%s\n", argv[1]);
 
     Img pic;
     if(argc < 1) {
@@ -65,20 +68,31 @@ int main(int argc, char** argv)
 
     printf("\n\n");
 
-    printf("width = %d\n", pic.width);
-    char senhaDescodificada[] = "";
+    int verificador = 0;
+
+    int tamanhoSenha = contaTamanho(0, pic);
+    char senhaDescodificada[tamanhoSenha];
     decodificacaoEsteganografia(senhaDescodificada, 0, pic);
 
-    printf("%s\n", senhaDescodificada);
-    printf("width = %d\n", pic.width);
-    char senha[10]; // AJUSTAR O TAMANHO CONFORME A SENHA DA IMAGEM
-    printf("Digite a senha:");
-    scanf(" %[^\n]s", senha);
+    printf("senhaDecodificada = %s\n", senhaDescodificada);
+    char senha[tamanhoSenha];
 
-    printf("width = %d\n", pic.width);
+    do{
+        printf("Digite a senha:");
+        scanf(" %[^\n]s", senha);
 
-    char msgDecodificada[] = "";
+        if(strcmp(senha, senhaDescodificada) == 0){
+            verificador = 1;
+        }else{
+            printf("\nSenha incorreta! Digite novamente\n\n");
+        }
+    }while (verificador < 1);
+
+    int tamanhoMsg = contaTamanho(1, pic);
+    char msgDecodificada[tamanhoMsg];
     decodificacaoEsteganografia(msgDecodificada, 1, pic);
+
+    printf("msgDecodificada = %s\n", msgDecodificada);
 
     free(pic.img);
 }
@@ -91,13 +105,10 @@ char separaBitsPalavra(unsigned char* bit8_7, unsigned char* bit6_5, unsigned ch
     *bit4_3 = *bit4_3<<2;
     *bit2_1 = *bit2_1;
 
-//    printf("bit 8 e 7: %d\nbit 6 e 5: %d\nbit 4 e 3: %d\nbit 2 e 1: %d\n\n\n", bit8_7,bit6_5,bit4_3,bit2_1);
-
     letra = *bit8_7 | letra;
     letra = *bit6_5 | letra;
     letra = *bit4_3 | letra;
     letra = *bit2_1 | letra;
-
 
     return letra;
 }
@@ -113,16 +124,14 @@ void decodificacaoEsteganografia(char vetor[], int tipo, Img pic){
     unsigned int mask = 0b00000011;
 
     char letra;
-    int tamanho = 1;
+    int tamanho = 0;
 
 
     int iniciaEm;
     int num_bytes = pic.width * pic.height;
 
-    //printf("width = %d\n", pic.width);
     if(tipo >= 1){
         iniciaEm = pic.width;
-        printf("iniciaEm = %d\n", iniciaEm);
     }else{
         iniciaEm = 0;
     }
@@ -134,114 +143,131 @@ void decodificacaoEsteganografia(char vetor[], int tipo, Img pic){
         unsigned char bit4_3;
         unsigned char bit2_1;
 
-
-        //printf("[%d %d %d %d]\n\n", pic.img[i].r, pic.img[i].g, pic.img[i].b,  pic.img[i+1].r);
-
-        printf("i = %d\n", i);
-        printf("[%02X %02X %02X %02X]\n", pic.img[i].r, pic.img[i].g, pic.img[i].b,  pic.img[i+1].r);
-
         bit8_7 = pic.img[i].r & mask;
         bit6_5 = pic.img[i].g & mask;
         bit4_3 = pic.img[i].b & mask;
         bit2_1 = pic.img[i+1].r & mask;
 
-
-
         letra = separaBitsPalavra(&bit8_7, &bit6_5, &bit4_3, &bit2_1);
 
-
-        printf("letra = %c\n", letra);
-
-/*
-        //char *str2 = malloc(len + 1 + 1 );
-        //strcpy(str2, str);
-        char str2[tamanho];// = letra;
-        //str2[len + 1] = '\0';
-
-        str2[tamanho] = letra;
-        strcpy(vetor,str2);
-        printf( "str2 = %s\n", str2 );
-        printf("vetor = %s\n", vetor);
-
-
-        free(str2);
-        //vetor[] = letra
-*/
-        // ADICIONAR A LETRA NA MENSAGEM
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         if(letra == '|'){
-            printf("IF 1");
+            vetor[tamanho] = '\0';
             break;
         }
 
-
-       printf("[%02X %02X %02X %02X]\n", pic.img[i+1].r, pic.img[i+1].g, pic.img[i+2].b,  pic.img[i+2].r);
+        vetor[tamanho] = letra;
+        tamanho = tamanho +1;
 
         bit8_7 = pic.img[i+1].g & mask;
         bit6_5 = pic.img[i+1].b & mask;
         bit4_3 = pic.img[i+2].r & mask;
         bit2_1 = pic.img[i+2].g & mask;
 
-       //printf("[%02X %02X %02X %02X]\n\n", pic.img[i].r, pic.img[i].g, pic.img[i].b,  pic.img[i+1].r);
-
         letra = separaBitsPalavra(&bit8_7, &bit6_5, &bit4_3, &bit2_1);
 
-        printf("letra = %c\n", letra);
-
-        // ADICIONAR A LETRA NA MENSAGEM
-/*
-        tamanho = tamanho + 1;
-
-        str2[tamanho];
-        str2[tamanho] = letra;
-        strcpy(vetor,str2);
-        printf("str2 = %s\n", str2);
-        printf("vetor = %s\n", vetor);
-
-        free(str2);
-
-*/
         if(letra == '|'){
-            printf("IF 2");
+            vetor[tamanho] = '\0';
             break;
         }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        printf("[%02X %02X %02X %02X]\n", pic.img[i+2].r, pic.img[i+3].g, pic.img[i+3].b,  pic.img[i+3].r);
-
+        vetor[tamanho] = letra;
+        tamanho = tamanho +1;
 
         bit8_7 = pic.img[i+2].b & mask;
         bit6_5 = pic.img[i+3].r & mask;
         bit4_3 = pic.img[i+3].g & mask;
         bit2_1 = pic.img[i+3].b & mask;
 
-//        printf("[%02X %02X %02X %02X]\n\n", pic.img[i].r, pic.img[i].g, pic.img[i].b,  pic.img[i+1].r);
+        letra = separaBitsPalavra(&bit8_7, &bit6_5, &bit4_3, &bit2_1);
 
+         if(letra == '|'){
+            vetor[tamanho] = '\0';
+            break;
+        }
+
+        vetor[tamanho] = letra;
+        tamanho = tamanho +1;
+    }
+}
+
+
+int contaTamanho(int tipo, Img pic){
+
+    unsigned int mask = 0b00000011;
+
+    char letra;
+    int tamanho = 0;
+
+    int iniciaEm;
+    int num_bytes = pic.width * pic.height;
+
+    if(tipo >= 1){
+        iniciaEm = pic.width;
+    }else{
+        iniciaEm = 0;
+    }
+
+    for(int i=iniciaEm; i<num_bytes; i= i+4){
+
+        unsigned char bit8_7;
+        unsigned char bit6_5;
+        unsigned char bit4_3;
+        unsigned char bit2_1;
+
+        bit8_7 = pic.img[i].r & mask;
+        bit6_5 = pic.img[i].g & mask;
+        bit4_3 = pic.img[i].b & mask;
+        bit2_1 = pic.img[i+1].r & mask;
 
         letra = separaBitsPalavra(&bit8_7, &bit6_5, &bit4_3, &bit2_1);
 
-        printf("letra = %c\n", letra);
-
-        // ADICIONAR A LETRA NA MENSAGEM
-  /*      tamanho = tamanho + 1;
-
-        str2[tamanho];
-        str2[tamanho] = letra;
-        strcpy(vetor,str2);
-        printf("str2 = %s\n", str2);
-        printf("vetor = %s\n", vetor);
-
-        free(str2);
-*/
-         if(letra == '|'){
-            printf("IF 3");
+        if(letra == '|'){
+            return tamanho;
             break;
         }
+
+        tamanho = tamanho +1;
+
+        bit8_7 = pic.img[i+1].g & mask;
+        bit6_5 = pic.img[i+1].b & mask;
+        bit4_3 = pic.img[i+2].r & mask;
+        bit2_1 = pic.img[i+2].g & mask;
+
+        letra = separaBitsPalavra(&bit8_7, &bit6_5, &bit4_3, &bit2_1);
+
+        if(letra == '|'){
+            return tamanho;
+            break;
+        }
+
+        tamanho = tamanho +1;
+
+        bit8_7 = pic.img[i+2].b & mask;
+        bit6_5 = pic.img[i+3].r & mask;
+        bit4_3 = pic.img[i+3].g & mask;
+        bit2_1 = pic.img[i+3].b & mask;
+
+        letra = separaBitsPalavra(&bit8_7, &bit6_5, &bit4_3, &bit2_1);
+
+         if(letra == '|'){
+            return tamanho;
+            break;
+        }
+
+        tamanho = tamanho +1;
     }
-    return vetor;
+    return 0;
+}
+
+
+void juntaLetra(char letra, char vetor[], int tamanho) {
+
+    char str2[tamanho+1];
+    strcpy(str2, vetor);
+    str2[tamanho] = letra;
+    strcpy(vetor,str2);
+    free(str2);
+
 }
 
 void funcao(char vetor[], int tamanho) {
