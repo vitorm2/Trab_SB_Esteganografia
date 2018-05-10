@@ -19,7 +19,7 @@ typedef struct {
 
 // Protótipos
 
-void funcao(char vetor[], int tamanho);
+void descriptografica(char vetor[], int tamanho);
 
 char separaBitsPalavra(unsigned char* bit8_7, unsigned char* bit6_5, unsigned char* bit4_3, unsigned char* bit2_1);
 
@@ -55,26 +55,12 @@ int main(int argc, char** argv)
     }
     load("saida.bmp", &pic);
 
-    printf("Primeiros 10 pixels da imagem:\n");
-    for(int i=0; i<8; i++) {
-        printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
-    }
-    printf("\n\n");
-
-    printf("Primeiros 10 pixels da imagem:\n");
-    for(int i=pic.width; i<(pic.width + 6); i++) {
-        printf("[%02X %02X %02X] ", pic.img[i].r, pic.img[i].g, pic.img[i].b);
-    }
-
-    printf("\n\n");
-
     int verificador = 0;
 
     int tamanhoSenha = contaTamanho(0, pic);
     char senhaDescodificada[tamanhoSenha];
     decodificacaoEsteganografia(senhaDescodificada, 0, pic);
 
-    printf("senhaDecodificada = %s\n", senhaDescodificada);
     char senha[tamanhoSenha];
 
     do{
@@ -92,7 +78,9 @@ int main(int argc, char** argv)
     char msgDecodificada[tamanhoMsg];
     decodificacaoEsteganografia(msgDecodificada, 1, pic);
 
-    printf("msgDecodificada = %s\n", msgDecodificada);
+    descriptografica(msgDecodificada, tamanhoMsg);
+
+    printf("\nMENSAGEM: %s\n", msgDecodificada);
 
     free(pic.img);
 }
@@ -259,28 +247,18 @@ int contaTamanho(int tipo, Img pic){
     return 0;
 }
 
-
-void juntaLetra(char letra, char vetor[], int tamanho) {
-
-    char str2[tamanho+1];
-    strcpy(str2, vetor);
-    str2[tamanho] = letra;
-    strcpy(vetor,str2);
-    free(str2);
-
-}
-
-void funcao(char vetor[], int tamanho) {
+void descriptografica(char vetor[], int tamanho) {
     int i;
 
     for(i= 0; i<tamanho; i++){
-        if(vetor[i] == 'z'){
-            vetor[i] = 97;
-        }else if(vetor[i] == 'Z'){
-            vetor[i] = 65;
+        if(vetor[i] == 'a'){
+            vetor[i] = 122;
+        }else if(vetor[i] == 'A'){
+            vetor[i] = 90;
+        }else if(vetor[i] == '|'){
+            break;
         }else if(vetor[i] != ' '){
-            vetor[i] = vetor[i] + 1;
+            vetor[i] = vetor[i] - 1;
         }
-    printf("%s", vetor);
     }
 }
